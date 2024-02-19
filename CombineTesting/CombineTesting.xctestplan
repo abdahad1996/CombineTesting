@@ -1,0 +1,28 @@
+{
+  "configurations" : [
+    {
+      "id" : "A97D3A73-607F-483E-981F-1338081ECE82",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:CombineTesting.xcodeproj",
+      "identifier" : "650B33CA2B64346F00363DDC",
+      "name" : "CombineTesting"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:CombineTesting.xcodeproj",
+        "identifier" : "650B33E02B64349000363DDC",
+        "name" : "CombineTestingTests"
+      }
+    }
+  ],
+  "version" : 1
+}

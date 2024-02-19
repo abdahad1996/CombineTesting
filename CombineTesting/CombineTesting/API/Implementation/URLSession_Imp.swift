@@ -8,13 +8,13 @@
 import Foundation
 import Combine
 
-protocol HTTPClient {
+public protocol HTTPClient {
    func get(url:URL) -> AnyPublisher<(Data,HTTPURLResponse),Error>
 }
 extension URLSession:HTTPClient{
    struct invalidHttpUrlResponse:Error{}
 
-   func get(url: URL) -> AnyPublisher<(Data, HTTPURLResponse), Error> {
+    public func get(url: URL) -> AnyPublisher<(Data, HTTPURLResponse), Error> {
        dataTaskPublisher(for: url).tryMap { result in
            guard let httpResponse = result.response as? HTTPURLResponse else {
                throw invalidHttpUrlResponse()

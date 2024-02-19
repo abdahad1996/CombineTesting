@@ -25,9 +25,14 @@ class ZipViewModel:ObservableObject{
         chainedViewState = .isLoading
         self.remoteZipLoader = remoteZipLoader
         
+        
+        fetch()
+    }
+    
+    func fetch(){
         remoteZipLoader.fetchData(url: Endpoint.post.url(baseURL: URL(string:"https://jsonplaceholder.typicode.com/posts")!))
             .sink(receiveCompletion: { [weak self] completion in
-                if case .failure(let error) = completion {
+                if case .failure(_) = completion {
                     self?.chainedViewState = .failure
 
                 }
@@ -35,10 +40,7 @@ class ZipViewModel:ObservableObject{
                 self?.chainedViewState = .success(comments: Comments, title: PostDetail.title)
             })
             .store(in: &cancellable)
-        
     }
-    
-    
 }
 
 
@@ -74,7 +76,7 @@ struct ZipViewView:View {
     ZipViewView(vm: ZipViewModel(remoteZipLoader: RemoteZipLoaderStub()))
 }
 
-class RemoteZipLoaderStub:ZipLoader{
+private class RemoteZipLoaderStub:ZipLoader{
     func fetchData(url: URL) -> AnyPublisher<(PostDetail, [Comment]), Error> {
         let postDeatail = PostDetail(title: "post1")
         let comments = [

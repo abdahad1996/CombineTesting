@@ -7,15 +7,27 @@
 
 import Foundation
 
-public struct Post: Decodable {
+public struct Post: Codable,Equatable {
     let id: Int
     let title: String
+    
+    public init(id: Int, title: String) {
+        self.id = id
+        self.title = title
+    }
 }
 
-public struct PostDetail: Decodable,Equatable {
+public struct PostDetail: Codable,Equatable {
     let title: String
+    public init(title: String) {
+        self.title = title
+    }
 }
 
-public struct Comment:Decodable,Equatable{
+public struct Comment:Codable,Equatable{
     let body:String
+    
+    public init( body: String) {
+        self.body = body
+    }
 }

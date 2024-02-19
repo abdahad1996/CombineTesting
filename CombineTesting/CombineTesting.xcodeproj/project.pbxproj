@@ -17,6 +17,7 @@
 		650B33F22B6434CE00363DDC /* NetworkLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 650B33F12B6434CE00363DDC /* NetworkLayer.swift */; };
 		650B33F52B643E9E00363DDC /* URLSession_Imp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 650B33F42B643E9E00363DDC /* URLSession_Imp.swift */; };
 		650B33F82B64546B00363DDC /* EndPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 650B33F72B64546B00363DDC /* EndPoint.swift */; };
+		65828C8C2B667665002EEF4A /* RemotePostLoaderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65828C8B2B667665002EEF4A /* RemotePostLoaderTest.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,6 +44,8 @@
 		650B33F12B6434CE00363DDC /* NetworkLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkLayer.swift; sourceTree = "<group>"; };
 		650B33F42B643E9E00363DDC /* URLSession_Imp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSession_Imp.swift; sourceTree = "<group>"; };
 		650B33F72B64546B00363DDC /* EndPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndPoint.swift; sourceTree = "<group>"; };
+		650B33FA2B64876400363DDC /* CombineTesting.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = CombineTesting.xctestplan; sourceTree = "<group>"; };
+		65828C8B2B667665002EEF4A /* RemotePostLoaderTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemotePostLoaderTest.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +69,7 @@
 		650B33C22B64346F00363DDC = {
 			isa = PBXGroup;
 			children = (
+				650B33FA2B64876400363DDC /* CombineTesting.xctestplan */,
 				650B33CD2B64346F00363DDC /* CombineTesting */,
 				650B33E22B64349000363DDC /* CombineTestingTests */,
 				650B33CC2B64346F00363DDC /* Products */,
@@ -108,6 +112,7 @@
 			isa = PBXGroup;
 			children = (
 				650B33E32B64349000363DDC /* CombineTestingTests.swift */,
+				65828C8B2B667665002EEF4A /* RemotePostLoaderTest.swift */,
 			);
 			path = CombineTestingTests;
 			sourceTree = "<group>";
@@ -260,6 +265,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65828C8C2B667665002EEF4A /* RemotePostLoaderTest.swift in Sources */,
 				650B33E42B64349000363DDC /* CombineTestingTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

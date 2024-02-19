@@ -9,98 +9,138 @@ import Foundation
 import Combine
 
 
-protocol PostsLoader {
+public protocol PostsLoader {
     func fetchPosts(url:URL) -> AnyPublisher<[Post],Error>
 }
 
-protocol PostDetailsLoader {
+public protocol PostDetailsLoader {
     func fetchPostDetails(url:URL) -> AnyPublisher<PostDetail,Error>
 }
 
-protocol CommentsLoader {
-    func fetchComments(posts:[Post]) -> AnyPublisher<[Comment],Error>
+public protocol CommentsLoader {
+    func fetchComments(url: URL) -> AnyPublisher<[Comment],Error>
 }
 
-protocol ZipLoader {
+public protocol ZipLoader {
     func fetchData(url:URL) -> AnyPublisher<(PostDetail,[Comment]),Error>
 }
+
+
+public class RemoteCommentsLoader:CommentsLoader{
+    let session:HTTPClient
+    public init(session: HTTPClient) {
+        self.session = session
+    }
+    public func fetchComments(url: URL) -> AnyPublisher<[Comment], Error> {
+        return session.get(url: url)
+            .mapError(GenericMapper.mapError)
+            .tryMap(GenericMapper.GenericMap)
+            .eraseToAnyPublisher()
         
-
-////mapping logic may change dependening on status code so i like to encapuslate the logic here
-//class GenericApiMapper{
-//    static func map<T>(data:Data,response:HTTPURLResponse) throws -> T where T:Decodable{
-//        if (200..<300) ~= response.statusCode {
-//            return try customDateJSONDecoder.decode(T.self, from: data)
-//        }
-//        if response.statusCode == 401 {
-//            throw APIErrorHandler.tokenExpired
-//        }
-//        
-//        if let error = try? JSONDecoder().decode(ApiErrorDTO.self, from: data) {
-//            throw APIErrorHandler.customApiError(error)
-//        } else {
-//            throw APIErrorHandler.emptyErrorWithStatusCode(response.statusCode.description)
-//        }
-//        
-//    }
-//}
-
-
-public class RemoteZipLoader:ZipLoader,PostsLoader {
+    }
+    
+}
+public class RemotePostDetailsLoader:PostDetailsLoader{
+    let session:HTTPClient
+    public init(session: HTTPClient) {
+        self.session = session
+    }
+    public func fetchPostDetails(url: URL) -> AnyPublisher<PostDetail, Error> {
+        return session.get(url: url)
+            .mapError(GenericMapper.mapError)
+            .tryMap(GenericMapper.GenericMap)
+            .eraseToAnyPublisher()
+        
+    }
+    
+}
+public class RemotePostsLoader:PostsLoader{
     
     let session:HTTPClient
-    
-    public enum error:Error {
+    public init(session: HTTPClient) {
+        self.session = session
+    }
+    public enum RemoteZipLoaderError:Error {
         case connectivity
         case invalidData
     }
-    init(session: HTTPClient) {
-        self.session = session
+    public func fetchPosts(url: URL) -> AnyPublisher<[Post], Error> {
+        return session.get(url: url)
+            .mapError(GenericMapper.mapError)
+            .tryMap(GenericMapper.GenericMap)
+            .eraseToAnyPublisher()
+        
     }
-   
-    func fetchData(url: URL) -> AnyPublisher<(PostDetail, [Comment]), Error> {
-       return fetchPosts(url: url).flatMap {(posts) -> AnyPublisher<(PostDetail, [Comment]), Error> in
+    
+}
+public class RemoteZipLoader:ZipLoader{
+    
+    let session:HTTPClient
+    let publisher1:PostsLoader
+    let publisher2:PostDetailsLoader
+    let publisher3:CommentsLoader
+
+    
+    public init(session: HTTPClient,publisher1:PostsLoader,publisher2:PostDetailsLoader,publisher3:CommentsLoader) {
+        self.session = session
+        self.publisher1 = publisher1
+        self.publisher2 = publisher2
+        self.publisher3 = publisher3
+    }
+    
+    public func fetchData(url: URL) -> AnyPublisher<(PostDetail, [Comment]), Error> {
+        return publisher1.fetchPosts(url: url)
+            .flatMap {(posts) -> AnyPublisher<(PostDetail, [Comment]), Error> in
             let post = posts.first!
             let postDetailUrl = Endpoint.postDetail(post: post).url(baseURL: url)
             let commentUrl = Endpoint.Comments(post: post).url(baseURL: url)
-
-           return Publishers.Zip(
-            self.fetchPostDetails(url: postDetailUrl),
-            self.fetchComments(url: commentUrl)
-           ).eraseToAnyPublisher()
-               
-        }.eraseToAnyPublisher()
-       
+            return Publishers.Zip(
+                self.publisher2.fetchPostDetails(url: postDetailUrl),
+                self.publisher3.fetchComments(url: commentUrl)
+            ).eraseToAnyPublisher()
+            
+        }
+        
+        .eraseToAnyPublisher()
+        
     }
     
-    func fetchPosts(url: URL) -> AnyPublisher<[Post], Error> {
-        return session.get(url: url).tryMap(GenericMap).eraseToAnyPublisher()
+    
+    
+    
+    
+}
+
+public class GenericMapper {
+    
+    public enum RemoteError:Swift.Error {
+        case connectivity
+        case invalidData
     }
     
-    func fetchComments(url: URL) -> AnyPublisher<[Comment],Error>{
-        return session.get(url: url).tryMap(GenericMap).eraseToAnyPublisher()
-    }
-
-    func fetchPostDetails(url:URL) -> AnyPublisher<PostDetail,Error>{
-        return session.get(url: url).tryMap(GenericMap).eraseToAnyPublisher()
-
-    }
+    static func mapError(error:Error) -> RemoteError{
+            if let responseError = error as? RemoteError {
+                return responseError
+            }else{
+                return RemoteError.connectivity
+            }
+        }
+    
+    
+    
 
     
-    func GenericMap<T>(data:Data,response:HTTPURLResponse) throws -> T where T:Decodable {
+    static func GenericMap<T>(data:Data,response:HTTPURLResponse) throws -> T where T:Decodable {
         guard response.statusCode == 200 else {
-            throw error.connectivity
+            throw RemoteError.connectivity
         }
                
         guard let decodable: T = try? JSONDecoder().decode(T.self, from: data) else {
-            throw error.invalidData
+            throw RemoteError.invalidData
         }
         
         return decodable
         
     }
     
-    
-    
 }
-
